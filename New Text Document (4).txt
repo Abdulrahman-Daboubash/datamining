@@ -1,0 +1,88 @@
+import pandas as pd  
+import numpy as np  
+
+
+from sklearn.model_selection import train_test_split 
+from sklearn.tree import DecisionTreeClassifier  
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier 
+from sklearn.linear_model import LogisticRegression  
+from sklearn.neighbors import KNeighborsClassifier 
+from sklearn.svm import SVC 
+from sklearn.metrics import accuracy_score
+from sklearn import metrics
+
+
+train_data = pd.read_csv('/kaggle/input/cis-321-data-mining-1-st-2024/train.csv') 
+test_data = pd.read_csv('/kaggle/input/cis-321-data-mining-1-st-2024/test.csv')
+
+train_data.info()
+
+ train_data.isna().sum()
+
+x = train_data.drop(['id', 'Response'], axis=1) 
+y = train_data['Response']
+
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.3)
+
+dt_model = DecisionTreeClassifier() 
+dt_model.fit(x_train, y_train)  
+y_predict_dt = dt_model.predict(x_test) 
+
+accuracy_dt=metrics.accuracy_score(y_predict_dt,y_test)
+accuracy_dt 
+
+rf_model = RandomForestClassifier()  
+rf_model.fit(x_train, y_train)  
+y_predict_rf = rf_model.predict(x_test)  
+
+accuracy_rf=metrics.accuracy_score(y_predict_rf,y_test)
+accuracy_rf
+
+lr_model = LogisticRegression(max_iter=1000)  
+lr_model.fit(x_train, y_train)  
+y_predict_lr = lr_model.predict(x_test)  
+
+
+accuracy_lr=metrics.accuracy_score(y_predict_lr,y_test)
+accuracy_lr
+
+knn_model = KNeighborsClassifier()  
+knn_model.fit(x_train, y_train)  
+y_predict_knn = knn_model.predict(x_test)  
+
+accuracy_knn=metrics.accuracy_score(y_predict_knn,y_test)
+accuracy_knn
+
+svm_model = SVC() 
+svm_model.fit(x_train, y_train)  
+y_predict_svm = svm_model.predict(x_test) 
+
+accuracy_svm=metrics.accuracy_score(y_predict_svm,y_test)
+accuracy_svm
+
+gb_model = GradientBoostingClassifier()  
+gb_model.fit(x_train, y_train)  
+y_predict_gb = gb_model.predict(x_test) 
+
+accuracy_gb=metrics.accuracy_score(y_predict_gb,y_test)
+accuracy_gb
+
+results = {
+    'Model': ['Decision Tree', 'Random Forest', 'Logistic Regression', 'KNN', 'SVM', 'Gradient Boosting'],
+    'Accuracy': [accuracy_dt, accuracy_rf, accuracy_lr, accuracy_knn, accuracy_svm, accuracy_gb]
+}
+
+results_df = pd.DataFrame(results)
+
+results_df
+
+best_model = gb_model 
+
+
+x_test_final = test_data.drop(['id'], axis=1)
+
+
+predictions = best_model.predict(x_test_final)
+
+submission = pd.DataFrame({'Id': test_data['id'], 'Response': predictions})
+submission.to_csv('submission.csv', index=False)
